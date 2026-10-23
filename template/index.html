@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Pathway | Student Placement Predictor</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #080d19;
+      --panel: rgba(17, 25, 45, .82);
+      --panel-strong: #111a2e;
+      --line: rgba(164, 184, 226, .15);
+      --text: #f3f6ff;
+      --muted: #9aa8c3;
+      --accent: #8b7cff;
+      --accent-2: #48d9c5;
+      --danger: #ff718b;
+      --success: #43d9a3;
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      background:
+        radial-gradient(ellipse at 8% 0%, rgba(99, 83, 220, .2), transparent 38%),
+        radial-gradient(ellipse at 95% 25%, rgba(35, 190, 177, .11), transparent 30%),
+        var(--bg);
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .18;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 38px 38px; mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; position: relative; }
+    header {
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      padding: 25px 0 22px; border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #5a9cff); box-shadow: 0 8px 28px #7664ff38;
+      font-family: Manrope, sans-serif; font-weight: 800; font-size: 19px;
+    }
+    .brand-name { font: 800 16px Manrope, sans-serif; letter-spacing: .02em; }
+    .brand-sub { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: .08em; text-transform: uppercase; }
+    .header-status {
+      display: inline-flex; align-items: center; gap: 8px; color: #c2cde2; font-size: 12px;
+      border: 1px solid var(--line); background: #ffffff06; border-radius: 99px; padding: 9px 13px;
+    }
+    .pulse { width: 7px; height: 7px; background: var(--accent-2); border-radius: 50%; box-shadow: 0 0 0 4px #48d9c51b; }
+    .hero { padding: 47px 0 30px; display: grid; grid-template-columns: 1.2fr .8fr; gap: 30px; align-items: end; }
+    .eyebrow { color: #a99fff; text-transform: uppercase; font-size: 11px; letter-spacing: .19em; font-weight: 700; }
+    h1 { font: 800 clamp(34px, 5vw, 57px)/1.08 Manrope, sans-serif; letter-spacing: -.045em; margin: 13px 0 16px; }
+    h1 span { background: linear-gradient(100deg, #a99fff 10%, #64e1d2 90%); -webkit-background-clip: text; color: transparent; }
+    .hero-copy { color: var(--muted); max-width: 610px; line-height: 1.75; font-size: 14px; margin: 0; }
+    .hero-stat {
+      justify-self: end; width: min(100%, 310px); border: 1px solid var(--line); border-radius: 18px;
+      padding: 17px 18px; background: linear-gradient(135deg, #ffffff08, #ffffff02); display: flex; gap: 13px; align-items: center;
+    }
+    .stat-icon { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 14px; background: #8b7cff20; font-size: 20px; }
+    .stat-title { font-weight: 700; font-size: 13px; }
+    .stat-desc { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 4px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, .75fr); gap: 22px; align-items: start; padding-bottom: 44px; }
+    .panel { border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(18px); border-radius: var(--radius); overflow: hidden; box-shadow: 0 20px 70px #00000018; }
+    .panel-head { padding: 22px 24px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .panel-title { font: 700 17px Manrope, sans-serif; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .step-count { color: #b7b0ff; border: 1px solid #8b7cff45; background: #8b7cff14; border-radius: 9px; padding: 7px 10px; font-size: 11px; white-space: nowrap; }
+    form { padding: 23px 24px 25px; }
+    .section-label { display: flex; align-items: center; gap: 9px; margin: 3px 0 17px; font: 700 12px Manrope, sans-serif; color: #dbe2f4; letter-spacing: .04em; }
+    .section-label .number { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; color: #c5beff; background: #8b7cff1d; font-size: 11px; }
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px 16px; }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    label { display: flex; justify-content: space-between; gap: 10px; color: #c8d1e5; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .hint { color: #7887a6; font-size: 10px; font-weight: 400; }
+    .control-wrap { position: relative; }
+    input, select {
+      width: 100%; height: 47px; border-radius: 12px; outline: none; color: var(--text);
+      background: #080f20a8; border: 1px solid #8b9abb2c; padding: 0 13px; transition: border .2s, box-shadow .2s, background .2s;
+    }
+    input::placeholder { color: #596783; }
+    select { appearance: none; padding-right: 36px; }
+    select option { color: #f3f6ff; background: #111a2e; }
+    .select-arrow { position: absolute; right: 14px; top: 15px; color: #8f9db8; pointer-events: none; font-size: 12px; }
+    input:focus, select:focus { border-color: #8b7cff; box-shadow: 0 0 0 3px #8b7cff20; background: #0c1428; }
+    input:invalid:not(:placeholder-shown) { border-color: var(--danger); }
+    .range-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .range-value { font: 700 12px Manrope, sans-serif; color: #a99fff; }
+    input[type="range"] { height: 5px; padding: 0; accent-color: var(--accent); border: 0; background: #2b3550; border-radius: 99px; cursor: pointer; }
+    .range-scale { display: flex; justify-content: space-between; color: #65738e; font-size: 10px; margin-top: 5px; }
+    .divider { border: 0; border-top: 1px solid var(--line); margin: 25px 0 22px; }
+    .form-actions { display: flex; gap: 11px; margin-top: 26px; }
+    .btn { border: 0; border-radius: 12px; height: 49px; padding: 0 19px; font-weight: 700; font-size: 13px; transition: transform .18s, filter .18s, box-shadow .18s; }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { flex: 1; color: white; background: linear-gradient(105deg, #7968f4, #6b8dff); box-shadow: 0 10px 24px #7568f42e; }
+    .btn-secondary { color: #c3cce0; background: #ffffff08; border: 1px solid var(--line); }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+    .side-stack { display: grid; gap: 18px; }
+    .side-panel { padding: 21px; }
+    .side-title { font: 700 14px Manrope, sans-serif; margin: 0 0 7px; }
+    .side-copy { font-size: 12px; line-height: 1.65; color: var(--muted); margin: 0; }
+    .progress-list { margin-top: 20px; display: grid; gap: 16px; }
+    .progress-row { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+    .progress-icon { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: #ffffff09; border: 1px solid var(--line); font-size: 13px; }
+    .progress-name { font-size: 12px; font-weight: 700; }
+    .progress-desc { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 3px; }
+    .result-panel { display: none; animation: rise .4s ease both; }
+    .result-panel.show { display: block; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .result-top { padding: 23px; text-align: center; border-bottom: 1px solid var(--line); }
+    .result-symbol { width: 58px; height: 58px; margin: 0 auto 14px; display: grid; place-items: center; border-radius: 19px; font-size: 25px; }
+    .result-panel.placed .result-symbol { background: #43d9a31b; color: var(--success); border: 1px solid #43d9a344; }
+    .result-panel.not-placed .result-symbol { background: #ff718b1b; color: var(--danger); border: 1px solid #ff718b44; }
+    .result-kicker { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .17em; }
+    .result-title { font: 800 25px Manrope, sans-serif; margin: 8px 0; }
+    .result-panel.placed .result-title { color: var(--success); }
+    .result-panel.not-placed .result-title { color: var(--danger); }
+    .result-message { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 310px; margin: 0 auto; }
+    .result-bottom { padding: 18px 22px 22px; }
+    .result-note { font-size: 11px; color: #8998b5; line-height: 1.6; margin: 0; }
+    .loading { display: inline-flex; align-items: center; gap: 9px; }
+    .spinner { width: 15px; height: 15px; border: 2px solid #ffffff50; border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { display: none; border: 1px solid #ff718b45; background: #ff718b12; color: #ff9bad; padding: 12px 14px; border-radius: 11px; font-size: 12px; line-height: 1.5; margin-top: 15px; }
+    .toast.show { display: block; }
+    .footnote { text-align: center; color: #65738e; font-size: 11px; line-height: 1.6; padding: 0 0 28px; }
+    .footnote strong { color: #a3afc8; }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns: 1fr; padding-top: 35px; }
+      .hero-stat { justify-self: start; width: 100%; }
+      .layout { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 22px, 1180px); }
+      header { padding: 17px 0; }
+      .header-status { font-size: 0; padding: 10px; }
+      .header-status .pulse { width: 8px; height: 8px; }
+      .hero { padding: 32px 0 24px; gap: 20px; }
+      h1 { font-size: 37px; }
+      .panel-head { padding: 19px 17px 16px; }
+      form { padding: 20px 17px; }
+      .fields { grid-template-columns: 1fr; gap: 15px; }
+      .field.full { grid-column: auto; }
+      .side-stack { grid-template-columns: 1fr; }
+      .form-actions { flex-direction: column; }
+      .btn-secondary { height: 44px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">P</div>
+        <div>
+          <div class="brand-name">PATHWAY<span style="color:var(--accent-2)">.</span></div>
+          <div class="brand-sub">Student placement intelligence</div>
+        </div>
+      </div>
+      <div class="header-status"><span class="pulse"></span> Decision Tree · Prediction Portal</div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">A clearer view of your next step</div>
+        <h1>Understand your<br /><span>placement outlook.</span></h1>
+        <p class="hero-copy">Enter your academic performance, study habits, and student profile to receive a placement prediction from the trained Decision Tree model. Use the result as a guide—not a guarantee.</p>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-icon">✦</div>
+        <div>
+          <div class="stat-title">Built around your profile</div>
+          <div class="stat-desc">10 student attributes · One prediction from your connected ML model</div>
+        </div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Student profile</div>
+            <div class="panel-subtitle">Fill in the details below to run a prediction.</div>
+          </div>
+          <div class="step-count">10 INPUTS</div>
+        </div>
+
+        <form id="predictionForm">
+          <div class="section-label"><span class="number">01</span> Personal & academic details</div>
+          <div class="fields">
+            <div class="field">
+              <label for="gender">Gender <span class="hint">Required</span></label>
+              <div class="control-wrap">
+                <select id="gender" name="gender" required>
+                  <option value="" disabled selected>Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select><span class="select-arrow">⌄</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="branch">Branch <span class="hint">Required</span></label>
+              <div class="control-wrap">
+                <select id="branch" name="branch" required>
+                  <option value="" disabled selected>Select branch</option>
+                  <option value="CSE">Computer Science (CSE)</option>
+                  <option value="IT">Information Technology (IT)</option>
+                  <option value="ECE">Electronics (ECE)</option>
+                  <option value="MECHANICAL">Mechanical</option>
+                  <option value="CIVIL">Civil</option>
+                  <option value="COMMERCE">Commerce</option>
+                </select><span class="select-arrow">⌄</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="previous_score">Previous score <span class="hint">0–100</span></label>
+              <input id="previous_score" name="previous_score" type="number" min="0" max="100" step="0.1" placeholder="e.g. 76.5" required />
+            </div>
+            <div class="field">
+              <label for="exam_score">Latest exam score <span class="hint">0–100</span></label>
+              <input id="exam_score" name="exam_score" type="number" min="0" max="100" step="0.1" placeholder="e.g. 82" required />
+            </div>
+          </div>
+
+          <hr class="divider" />
+          <div class="section-label"><span class="number">02</span> Study habits & routine</div>
+          <div class="fields">
+            <div class="field">
+              <div class="range-head"><label for="study_hours">Daily study hours</label><span class="range-value" id="studyHoursValue">6 hours</span></div>
+              <input id="study_hours" name="study_hours" type="range" min="0" max="12" step="0.5" value="6" />
+              <div class="range-scale"><span>0 hrs</span><span>12 hrs</span></div>
+            </div>
+            <div class="field">
+              <div class="range-head"><label for="sleep_hours">Daily sleep</label><span class="range-value" id="sleepHoursValue">7 hours</span></div>
+              <input id="sleep_hours" name="sleep_hours" type="range" min="3" max="12" step="0.5" value="7" />
+              <div class="range-scale"><span>3 hrs</span><span>12 hrs</span></div>
+            </div>
+            <div class="field">
+              <div class="range-head"><label for="internet_usage">Daily internet usage</label><span class="range-value" id="internetUsageValue">4 hours</span></div>
+              <input id="internet_usage" name="internet_usage" type="range" min="0" max="12" step="0.5" value="4" />
+              <div class="range-scale"><span>0 hrs</span><span>12 hrs</span></div>
+            </div>
+            <div class="field">
+              <label for="attendance">Attendance <span class="hint">Percentage</span></label>
+              <input id="attendance" name="attendance" type="number" min="0" max="100" step="0.1" placeholder="e.g. 85" required />
+            </div>
+            <div class="field">
+              <label for="assignments_completed">Assignments completed <span class="hint">Count</span></label>
+              <input id="assignments_completed" name="assignments_completed" type="number" min="0" step="1" placeholder="e.g. 18" required />
+            </div>
+            <div class="field">
+              <label for="extracurricular">Extracurricular activities</label>
+              <div class="control-wrap">
+                <select id="extracurricular" name="extracurricular" required>
+                  <option value="" disabled selected>Select an option</option>
+                  <option value="Yes">Yes, I participate</option>
+                  <option value="No">No, not currently</option>
+                </select><span class="select-arrow">⌄</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="toast" id="errorMessage" role="alert"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="predictBtn" type="submit">Predict placement <span aria-hidden="true">↗</span></button>
+            <button class="btn btn-secondary" type="reset" id="resetBtn">Reset form</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel side-panel">
+          <h2 class="side-title">How it works</h2>
+          <p class="side-copy">Your details are sent to the FastAPI endpoint, which prepares the input columns and asks your saved Decision Tree model for a prediction.</p>
+          <div class="progress-list">
+            <div class="progress-row">
+              <div class="progress-icon">⌘</div>
+              <div><div class="progress-name">1. Add your details</div><div class="progress-desc">Use your actual academic scores and routine where possible.</div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-icon">⟡</div>
+              <div><div class="progress-name">2. Run the model</div><div class="progress-desc">The form sends a JSON request to <code>/predict</code>.</div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-icon">↗</div>
+              <div><div class="progress-name">3. Review the result</div><div class="progress-desc">Use the prediction to reflect on preparation and support needs.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel result-panel" id="resultPanel" aria-live="polite">
+          <div class="result-top">
+            <div class="result-symbol" id="resultSymbol">✓</div>
+            <div class="result-kicker">Model prediction</div>
+            <div class="result-title" id="resultTitle">Placed</div>
+            <p class="result-message" id="resultMessage"></p>
+          </div>
+          <div class="result-bottom">
+            <p class="result-note"><strong>Important:</strong> This is a model-generated classification based on the provided inputs and training data. It is not a guarantee of an actual job outcome.</p>
+          </div>
+        </section>
+
+        <section class="panel side-panel">
+          <h2 class="side-title">A quick reminder</h2>
+          <p class="side-copy">Placement depends on many factors beyond these fields, including interview performance, communication, projects, internships, and market conditions. Keep building your skills whatever the prediction says.</p>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footnote">PATHWAY is an academic prediction interface. <strong>Predictions are estimates, not promises.</strong></footer>
+  </div>
+
+  <script>
+    const form = document.getElementById('predictionForm');
+    const predictBtn = document.getElementById('predictBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const resultPanel = document.getElementById('resultPanel');
+
+    const rangeConfig = [
+      ['study_hours', 'studyHoursValue'],
+      ['sleep_hours', 'sleepHoursValue'],
+      ['internet_usage', 'internetUsageValue']
+    ];
+
+    function formatHours(value) {
+      const number = Number(value);
+      return `${Number.isInteger(number) ? number : number.toFixed(1)} ${number === 1 ? 'hour' : 'hours'}`;
+    }
+
+    rangeConfig.forEach(([inputId, outputId]) => {
+      const input = document.getElementById(inputId);
+      const output = document.getElementById(outputId);
+      const update = () => output.textContent = formatHours(input.value);
+      input.addEventListener('input', update);
+      update();
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+    }
+
+    function clearError() {
+      errorMessage.textContent = '';
+      errorMessage.classList.remove('show');
+    }
+
+    function validateNumericFields() {
+      const numericFields = [
+        ['previous_score', 'Previous score', 0, 100],
+        ['exam_score', 'Latest exam score', 0, 100],
+        ['attendance', 'Attendance', 0, 100],
+        ['assignments_completed', 'Assignments completed', 0, Infinity]
+      ];
+      for (const [id, label, min, max] of numericFields) {
+        const field = document.getElementById(id);
+        const value = Number(field.value);
+        if (field.value.trim() === '' || !Number.isFinite(value) || value < min || value > max) {
+          field.focus();
+          return `${label} must be ${max === Infinity ? 'zero or greater' : `between ${min} and ${max}`}.`;
+        }
+        if (id === 'assignments_completed' && !Number.isInteger(value)) {
+          field.focus();
+          return 'Assignments completed must be a whole number.';
+        }
+      }
+      return '';
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearError();
+
+      if (!form.reportValidity()) return;
+      const validationError = validateNumericFields();
+      if (validationError) {
+        showError(validationError);
+        return;
+      }
+
+      const payload = {
+        gender: document.getElementById('gender').value,
+        study_hours: Number(document.getElementById('study_hours').value),
+        attendance: Number(document.getElementById('attendance').value),
+        sleep_hours: Number(document.getElementById('sleep_hours').value),
+        internet_usage: Number(document.getElementById('internet_usage').value),
+        assignments_completed: Number(document.getElementById('assignments_completed').value),
+        previous_score: Number(document.getElementById('previous_score').value),
+        extracurricular: document.getElementById('extracurricular').value,
+        exam_score: Number(document.getElementById('exam_score').value),
+        branch: document.getElementById('branch').value
+      };
+
+      predictBtn.disabled = true;
+      predictBtn.innerHTML = '<span class="loading"><span class="spinner"></span> Analysing profile…</span>';
+      resultPanel.classList.remove('show', 'placed', 'not-placed');
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error('The server returned an unreadable response. Check that the FastAPI backend is running.');
+        }
+
+        if (!response.ok) {
+          const detail = typeof data.detail === 'string'
+            ? data.detail
+            : 'The server could not process these inputs. Please check the backend logs.';
+          throw new Error(detail);
+        }
+
+        if (!data || !['Placed', 'Not Placed'].includes(data.prediction)) {
+          throw new Error('The API response did not contain a valid prediction.');
+        }
+
+        const placed = data.prediction === 'Placed';
+        resultPanel.classList.add('show', placed ? 'placed' : 'not-placed');
+        document.getElementById('resultSymbol').textContent = placed ? '✓' : '↗';
+        document.getElementById('resultTitle').textContent = data.prediction;
+        document.getElementById('resultMessage').textContent = placed
+          ? 'The model classifies this student profile as likely to be placed. Keep preparing and continue strengthening your skills.'
+          : 'The model classifies this student profile as not placed. Consider extra practice, mock interviews, projects, and guidance from your placement cell.';
+        resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (error) {
+        showError(`${error.message || 'Something went wrong.'} Make sure the FastAPI server is running and this page is opened through the server, not directly as a local file.`);
+      } finally {
+        predictBtn.disabled = false;
+        predictBtn.innerHTML = 'Predict placement <span aria-hidden="true">↗</span>';
+      }
+    });
+
+    form.addEventListener('reset', () => {
+      clearError();
+      resultPanel.classList.remove('show', 'placed', 'not-placed');
+      setTimeout(() => rangeConfig.forEach(([inputId, outputId]) => {
+        document.getElementById(outputId).textContent = formatHours(document.getElementById(inputId).value);
+      }), 0);
+    });
+  </script>
+</body>
+</html>
